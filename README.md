@@ -17,7 +17,7 @@ REST API for a restaurant. Manages a food delivery system.
 ## NPM dependencies:
 Declared in **package.json** file. Must be installed to run the server.
 
--bcrypt: **$ npm install bcrypt**
+- bcrypt: **$ npm install bcrypt**
 - body-parser: **$ npm install body-parser**
 - compression: **$ npm install compression**
 - dotenv: **$ npm install dotenv**
@@ -32,8 +32,8 @@ Declared in **package.json** file. Must be installed to run the server.
 
 ## Database connection:
 
-Download XAMPP software from https://www.apachefriends.org/download.html
-Import the **delilah.sql** file into http://localhost/phpmyadmin/
+- Download XAMPP software from https://www.apachefriends.org/download.html
+- Import the **delilah.sql** file into http://localhost/phpmyadmin/
 
 **Local configuration file (default)**
 - Host: **localhost**
