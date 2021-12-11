@@ -1,0 +1,459 @@
+openapi: 3.0.1
+info:
+  title: Delilah Resto
+  description: This API allows you to manage a restaurant's online delivery system. As ADMIN you can add products to the store, update or delete them. You can also take orders from users and update their status. As a registered USER you can log in, update your information or delete your account. You can get a list or available products, add them to the cart and procede to make an order.    
+  contact:
+    email: antoalvarezg@gmail.com
+  version: 1.0.0
+
+servers:
+- url: http://localhost:3000
+
+tags:
+- name: Admin
+  description: Operations you can do as ADMIN
+- name: User
+  description: Operations you can do as USER
+    
+paths:
+
+  /register:
+    post:
+      tags:
+      - User
+      summary: Register new user
+      operationId: registerUser
+      requestBody:
+        description: User object that needs to be added to the db
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        400:
+          description: User already registered.
+          content: {}
+        201:
+          description: User created. Go to login.
+          content: {}
+  
+  /login:
+    post:
+      tags:
+      - User
+      summary: Log in and get a token
+      operationId: logIn
+      requestBody:
+        description: User data required for login
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        404:
+          description: User not found.
+          content: {}
+        400:
+          description: Not allowed. Invalid password.
+          content: {}
+        200:
+          description: Successful operation
+          content: 
+            application/json:
+              schema:
+                type: string
+                example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsImZ1bGxuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsInBob24lIjoiMzUxNjU0ODk2MyIsImFkZHJlc3MiOiJhZGRyZXNzMSIsInBhc3N3b3JkIjoicGFzc3dvcmQiLCJhZG1pbiI6MSwiaWF0IjoxNjA1OTk1MzUyfQ.cQ403w2n2bZXF-wxbPl7cLH_nazE2foaeh3wE4TME04' 
+                
+  /user/{id}:
+    put:
+      tags:
+      - User
+      summary: Update user information
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        description: ID of user that needs to be updated
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: User object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        200:
+          description: User updated.
+          content: {}
+    delete:
+      tags:
+      - User
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        description: ID of user that needs to be deleted
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: User deleted.
+          content: {}
+          
+  /users:
+    get:
+      tags:
+      - Admin
+      summary: Get all users
+      operationId: getUsers
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+        404:           
+          description: No users found.
+          content: {}
+      
+  /products:
+    get:
+      tags:
+      - Admin
+      - User
+      summary: Get all products (admin) and available ones (user)
+      operationId: getProducts
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+        404:           
+          description: No products found.
+          content: {}
+  
+  /product/add:
+    post:
+      tags:
+      - Admin
+      summary: Add new product to the store.
+      operationId: addProduct
+      requestBody:
+        description: Product object that needs to be added to the db
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        400:
+          description: Product already added.
+          content: {}
+        201:
+          description: New product added to the store.
+          content: {}
+  
+  /product/{id}:  
+    get:
+      tags:
+      - Admin
+      - User
+      summary: Get product by id
+      operationId: getProduct
+      parameters:
+      - name: id
+        in: path
+        description: ID of product to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: Product not found.
+          content: {}    
+    put:
+      tags:
+      - Admin
+      summary: Update product information
+      operationId: updateProduct
+      parameters:
+      - name: id
+        in: path
+        description: ID of product that needs to be updated
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Product object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        200:
+          description: Product updated.
+          content: {}
+    delete:
+      tags:
+      - Admin
+      summary: Delete product
+      operationId: deleteProduct
+      parameters:
+      - name: id
+        in: path
+        description: ID of product that needs to be deleted
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        404:           
+          description: Product not found.
+          content: {}
+        200:
+          description: Product deleted.
+          content: {}  
+      
+  /store/orders:
+    get:
+      tags:
+      - Admin
+      - User
+      summary: Get all orders (ADMIN) and particular orders (USER)
+      operationId: getOrders
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+        404:           
+          description: No orders found.
+          content: {}    
+  /store/cart:
+    post:
+      tags:
+      - User
+      summary: Add products to the cart.
+      operationId: addCart
+      requestBody:
+        description: Order object that gets pushed to cart array
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        400:
+          description: Please fill in all required inputs.
+          content: {}
+        200:
+          description: Product added to the cart.
+          content: {}        
+  /store/order:
+    post:
+      tags:
+      - User
+      summary: Confirm order.
+      operationId: order
+      responses:
+        200:
+          description: Order placed.
+          content: {}       
+  /store/order/{id}:
+    put:
+      tags:
+      - Admin
+      summary: Update order status.
+      operationId: updateStatus
+      parameters:
+      - name: id
+        in: path
+        description: ID of order that needs to be updated
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Status object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
+        required: true
+      responses:
+        200:
+          description: Status updated.
+          content: {}
+    delete:
+      tags:
+      - Admin
+      summary: Delete order
+      operationId: deleteOrder
+      parameters:
+      - name: id
+        in: path
+        description: ID of order that needs to be deleted
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        404:
+          description: Order not found.
+          content: {}
+        200:
+          description: Order deleted.
+          content: {}
+  
+components:
+  schemas:
+    Order:
+      required:
+        - product_id
+        - amount
+        - payment_method_id
+      type: object
+      properties:
+        order_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64  
+        timestamp:
+          type: string
+          format: date-time
+        order_status_id:
+          type: integer
+          format: int64
+        amount:
+          type: integer
+          format: int32
+        payment_method_id:
+          type: integer
+          format: int64
+    Status:
+      required:
+        - order_status_id
+      type: object
+      properties:
+        order_status_id:
+          type: integer
+          format: int64
+    User:
+      required:
+        - username
+        - fullname
+        - email
+        - phone
+        - address
+        - password
+        - admin
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+          example: AntoA7
+        fullname:
+          type: string
+          example: Antonella Alvarez
+        email:
+          type: string
+          example: antoalvarez7@gmail.com
+        phone:
+          type: string
+          example: '3516598411'
+        address:
+          type: string
+          example: 'Av. General Paz 111'
+        password:
+          type: string
+          example: pass1234
+        admin:
+          type: boolean
+    Login:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+          example: antoalvarez7@gmail.com
+        password:
+          type: string
+          example: pass1234
+    Product:
+      required:
+      - name
+      - price
+      - available
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: Papas bravas
+        price:
+          type: number
+          format: float
+          example: 330
+        description:
+          type: string
+          example: Papas fritas con cáscara, pimentón y sal.
+        image_url:
+          type: string
+          example: https://recetas.com/Papas-bravas.jpg
+        available:
+          type: boolean
+  
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    
+
+security:
+  - bearerAuth: []                 
+      
+    
